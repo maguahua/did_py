@@ -11,6 +11,8 @@ from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 
 
+
+
 # 根据省份文件生成省份元组供之后使用
 def gen_provinces(province_file):
     provinces_set = set()
@@ -27,12 +29,16 @@ def gen_provinces(province_file):
 
 
 # 使用ed25519生成一对公私钥对（不序列化）
-def gen_key_pair():
+def gen_key_pair_from_lib():
     # 私钥
     sk = ed25519.Ed25519PrivateKey.generate()
     # 公钥
     pk = sk.public_key()
     return pk, sk
+
+
+def gen_key_pair_form_ring():
+    aosring_randkeys()
 
 
 # 根据一个公钥生成一个DID
@@ -168,7 +174,7 @@ if __name__ == '__main__':
     值得注意的是，新生成的原始公私钥对对象和最开始的原始公私钥对对象是不同的
     由此说明，原始形式存储的是内存地址，但内容是相同的
     '''
-    pk, sk = gen_key_pair()
+    pk, sk = gen_key_pair_from_lib()
     print('pk:', pk)
     print('sk:', sk)
 

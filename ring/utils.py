@@ -87,6 +87,10 @@ def submodn(x, y):
     return (x - y) % n
 
 
+def h1(s):
+    return bytes_to_int(sha256(s).digest()) % n
+
+
 d = -121665 * inv(121666)
 I = pow(2, (q - 1) // 4, q)
 
@@ -103,4 +107,3 @@ By = 4 * inv(5)
 Bx = xrecover(By)
 B = [Bx % q, By % q]
 G = B
-

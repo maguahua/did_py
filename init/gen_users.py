@@ -9,7 +9,7 @@ Scheme : Did Method : DID Method-Specific Identifier
 import csv
 import random
 
-from utilities import gen_provinces, gen_key_pair, gen_did, pk_to_pem, sk_to_pem
+from utilities import gen_provinces, gen_key_pair_from_lib, gen_did, pk_to_pem, sk_to_pem
 
 
 def gen_all_users_did(users_file, users_num):
@@ -22,7 +22,7 @@ def gen_all_users_did(users_file, users_num):
         writer.writerow(fieldnames)
 
         for _ in range(users_num):
-            pk, sk = gen_key_pair()
+            pk, sk = gen_key_pair_from_lib()
             province = random.choice(provinces_tuple)
             did = gen_did(province, pk)
             row = [province, did, pk_to_pem(pk).decode(), sk_to_pem(sk).decode()]
