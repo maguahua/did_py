@@ -1,4 +1,4 @@
-from utils import *
+from ring.utils import *
 
 
 def sbmul(s):

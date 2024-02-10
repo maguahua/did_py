@@ -6,10 +6,9 @@ Scheme : Did Method : DID Method-Specific Identifier
 在本次实验中，用户的did，公钥，私钥都存储在一个文件中，这在现实中是不可取的
 '''
 
-import csv
 import random
 
-from utilities import gen_provinces, gen_key_pair_from_lib, gen_did, pk_to_pem, sk_to_pem
+from utilities import *
 
 
 def gen_all_users_did(users_file, users_num):
@@ -22,10 +21,10 @@ def gen_all_users_did(users_file, users_num):
         writer.writerow(fieldnames)
 
         for _ in range(users_num):
-            pk, sk = gen_key_pair_from_lib()
+            pk, sk = gen_key()
             province = random.choice(provinces_tuple)
             did = gen_did(province, pk)
-            row = [province, did, pk_to_pem(pk).decode(), sk_to_pem(sk).decode()]
+            row = [province, did, pk, sk]
 
             writer.writerow(row)
 
@@ -33,3 +32,4 @@ def gen_all_users_did(users_file, users_num):
 if __name__ == '__main__':
     # 生成 CSV 文件，例如生成10行数据
     gen_all_users_did('doc/users_data.csv', 1000)
+    print('Done')

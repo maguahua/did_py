@@ -57,7 +57,7 @@ def randb256():
 b = 256
 q = 2 ** 255 - 19
 n = l = 2 ** 252 + 27742317777372353535851937790883648493
-
+byte_length = (252 + 7) // 8
 
 def hashsn(*x):
     return hashs(*x) % n

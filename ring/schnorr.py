@@ -1,6 +1,6 @@
 from past.builtins import long
 
-from curve25519 import *
+from ring.curve25519 import *
 
 
 def schnorr_calc(xG, s, e, message, point=None):

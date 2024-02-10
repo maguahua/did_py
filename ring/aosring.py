@@ -1,10 +1,4 @@
-from schnorr import *
-
-
-def aosring_randkeys(n=20):
-    skeys = [randsn() for _ in range(0, n)]
-    pkeys = [sbmul(sk) for sk in skeys]
-    return pkeys, skeys
+from ring.schnorr import *
 
 
 def aosring_sign(pkeys, mypair, tees=None, alpha=None, message=None):
@@ -50,15 +44,11 @@ if __name__ == "__main__":
     msg = 'my test data'
 
     # 生成了3对key
-    pks, sks = aosring_randkeys(3)
+    from utilities import gen_key
+    pks, sks = gen_key()
     print('pks:\n', pks)
     print('sks:\n', sks)
 
-    sk = sks[1]
-    pk = pks[1]
-    mykey = (pk, sk)
-
-    sk_bytes = sk
 
     # 签名时提供所有的公钥，自己的公私钥对，以及消息m
     # sig=aosring_sign(pks,mykey, message=msg)

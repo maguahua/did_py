@@ -4,7 +4,7 @@
 
 import csv
 
-from utilities import gen_provinces, gen_key_pair_from_lib, gen_did, pk_to_pem, sk_to_pem
+from utilities import gen_provinces, gen_did, gen_key
 
 
 def gen_all_gms(gms_file):
@@ -14,12 +14,13 @@ def gen_all_gms(gms_file):
         writer = csv.writer(f)
         writer.writerow(fieldnames)
         for province in provinces_tuple:
-            sig_pk, sig_sk = gen_key_pair_from_lib()
-
+            sig_pk, sig_sk = gen_key()
             did = gen_did(province, sig_pk)
-            row = [province, did, pk_to_pem(sig_pk).decode(), sk_to_pem(sig_sk).decode()]
+            row = [province, did, sig_pk, sig_sk]
+
             writer.writerow(row)
 
 
 if __name__ == '__main__':
     gen_all_gms('doc/gms_data.csv')
+    print('Done')
