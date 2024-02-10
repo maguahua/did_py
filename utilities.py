@@ -32,31 +32,41 @@ def gen_key():
 
 
 # 单个大数和字节串互相转换
-def to_bytes(big_num):
-    big_num_str = str(big_num)
+def to_bytes(big_num) -> bytes:
+    big_num_str = str(big_num) if type(big_num) == int else big_num
     big_num_bytes = big_num_str.encode('utf-8')
     return big_num_bytes
 
 
-def to_big_num(big_num_bytes):
+def to_big_num(big_num_bytes: bytes) -> int:
     big_num_str = big_num_bytes.decode('utf-8')
     big_num = int(big_num_str)
     return big_num
 
 
 # 大数元组和字节串相互转换
-def tuple_to_bytes(big_num: tuple):
-    str_big_num = [str(num) for num in big_num]
-    str_joined = ','.join(str_big_num)
+def tuple_to_bytes(big_num_tuple: tuple) -> bytes:
+    str_joined = tuple_to_str(big_num_tuple)
     str_bytes = str_joined.encode('utf-8')
     return str_bytes
 
 
-def bytes_to_tuple(str_bytes):
-    str = str_bytes.decode('utf-8')
-    str_list = str.split(',')
-    big_num = tuple(int(num) for num in str_list)
+def bytes_to_tuple(big_num_bytes: bytes) -> tuple:
+    big_num_str = big_num_bytes.decode('utf-8')
+    big_num = str_to_tuple(big_num_str)
     return big_num
+
+
+def tuple_to_str(big_num_tuple: tuple) -> str:
+    big_num_str_list = [str(num) for num in big_num_tuple]
+    big_num_str = ','.join(big_num_str_list)
+    return big_num_str
+
+
+def str_to_tuple(big_num_str: str) -> tuple:
+    big_num_str_list = big_num_str.split(',')
+    big_num_tuple = tuple(int(num) for num in big_num_str_list)
+    return big_num_tuple
 
 
 # 根据一个公钥生成一个DID
@@ -160,7 +170,8 @@ def pk_to_base58(pk_bytes):
     return multikey
 
 
-def gen_did_doc(did, pk_bytes):
+def gen_did_doc(did: str, pk_str: str):
+    pk_bytes = to_bytes(pk_str)
     did_doc = {
         "@context": [
             "https://www.w3.org/ns/did/v1",
@@ -192,28 +203,28 @@ if __name__ == '__main__':
     值得注意的是，新生成的原始公私钥对对象和最开始的原始公私钥对对象是不同的
     由此说明，原始形式存储的是内存地址，但内容是相同的
     '''
-    # pk, sk = gen_key()
-    # print('pk:', pk)
-    # print('sk:', sk)
-
-    # sk_bytes = to_bytes(sk)
-    # print('sk_bytes:', sk_bytes)
-
-    # sk_new = to_big_num(sk_bytes)
-    # print('sk_new:', sk_new)
-
-    # pk_bytes = tuple_to_bytes(pk)
-    # print(pk_bytes)
-    #
-    # pk_new = bytes_to_tuple(pk_bytes)
-    # print(pk_new)
-
-    # 示例数字
     pk, sk = gen_key()
     print('pk:', pk)
     print('sk:', sk)
 
-    print(gen_did('shanghai', pk))
+    pk_bytes = tuple_to_bytes(pk)
+    print('pk_bytes:', pk_bytes)
+
+    pk_new = bytes_to_tuple(pk_bytes)
+    print('pk_new:', pk_new)
+
+    sk_bytes = to_bytes(sk)
+    print('sk_bytes:', sk_bytes)
+
+    sk_new = to_big_num(sk_bytes)
+    print('sk_new:', sk_new)
+
+    # 示例数字
+    # pk, sk = gen_key()
+    # print('pk:', pk)
+    # print('sk:', sk)
+    #
+    # print(gen_did('shanghai', pk))
 
     #
     # # 将数字转换为字节串，使用252位（ceil(252/8) = 32 字节）
