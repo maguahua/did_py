@@ -6,11 +6,10 @@ import base58
 import numpy as np
 import pandas as pd
 
-# 根据省份文件生成省份元组供之后使用
-from ring.curve25519 import sbmul
-from ring.utils import randsn
+from src.ring import randsn, sbmul
 
 
+# 根据这个方法生成包含所有省份的元组，这个元组中只包含省份，为之后生成省份信息做铺垫
 def gen_provinces(province_file):
     provinces_set = set()
 
@@ -25,6 +24,16 @@ def gen_provinces(province_file):
     return provinces_tuple
 
 
+# 生成一个字典，字典的键是省份，值是省份对应的did
+def get_province_did(gms_data_filename):
+    df = pd.read_csv(gms_data_filename)
+    province = df['province']
+    did = df['did']
+    gms_province_did = pd.Series(did.values, index=province).to_dict()
+    return gms_province_did
+
+
+# 生成一对公私钥对
 def gen_key():
     sk = randsn()
     pk = sbmul(sk)
@@ -57,6 +66,7 @@ def bytes_to_tuple(big_num_bytes: bytes) -> tuple:
     return big_num
 
 
+# 大数元组和字符串互相转换
 def tuple_to_str(big_num_tuple: tuple) -> str:
     big_num_str_list = [str(num) for num in big_num_tuple]
     big_num_str = ','.join(big_num_str_list)
@@ -64,9 +74,18 @@ def tuple_to_str(big_num_tuple: tuple) -> str:
 
 
 def str_to_tuple(big_num_str: str) -> tuple:
+    big_num_str = big_num_str.strip("()")
     big_num_str_list = big_num_str.split(',')
     big_num_tuple = tuple(int(num) for num in big_num_str_list)
     return big_num_tuple
+
+
+def str_sig_to_tuple(str_sig: str) -> tuple:
+    result = eval(str_sig)
+
+    pk_list, tees, cee = result
+    tuple_sig = (pk_list, tees, cee)
+    return tuple_sig
 
 
 # 根据一个公钥生成一个DID
@@ -165,11 +184,19 @@ def gen_did(province, pk: tuple):
 #
 # # endregion
 
-def pk_to_base58(pk_bytes):
-    multikey = 'z' + base58.b58encode(pk_bytes).decode()
+
+# 把字节串用base58编码格式编码
+def bytes_to_base58(bytes_data: bytes):
+    multikey = 'z' + base58.b58encode(bytes_data).decode()
     return multikey
 
 
+# 把元组用base58格式编码
+def tuple_to_base58(big_num_tuple: tuple):
+    return bytes_to_base58(tuple_to_bytes(big_num_tuple))
+
+
+# 生成did文档，公钥编码格式是base58
 def gen_did_doc(did: str, pk_str: str):
     pk_bytes = to_bytes(pk_str)
     did_doc = {
@@ -182,12 +209,13 @@ def gen_did_doc(did: str, pk_str: str):
             "id": did,
             "type": "Multikey",
             "controller": did,
-            "publicKeyMultibase": pk_to_base58(pk_bytes)
+            "publicKeyMultibase": bytes_to_base58(pk_bytes)
         }]
     }
     return json.dumps(did_doc, indent=4)
 
 
+# 为一个csv文件添加一个新列
 def add_new_column(file, new_col_name):
     df = pd.read_csv(file)
     df[new_col_name] = np.nan
@@ -203,21 +231,25 @@ if __name__ == '__main__':
     值得注意的是，新生成的原始公私钥对对象和最开始的原始公私钥对对象是不同的
     由此说明，原始形式存储的是内存地址，但内容是相同的
     '''
-    pk, sk = gen_key()
-    print('pk:', pk)
-    print('sk:', sk)
+    gms_province_did = get_province_did('vcs/doc/gms_data.csv')
+    print(gms_province_did)
+    print(len(gms_province_did))
 
-    pk_bytes = tuple_to_bytes(pk)
-    print('pk_bytes:', pk_bytes)
-
-    pk_new = bytes_to_tuple(pk_bytes)
-    print('pk_new:', pk_new)
-
-    sk_bytes = to_bytes(sk)
-    print('sk_bytes:', sk_bytes)
-
-    sk_new = to_big_num(sk_bytes)
-    print('sk_new:', sk_new)
+    # pk, sk = gen_key()
+    # print('pk:', pk)
+    # print('sk:', sk)
+    #
+    # pk_bytes = tuple_to_bytes(pk)
+    # print('pk_bytes:', pk_bytes)
+    #
+    # pk_new = bytes_to_tuple(pk_bytes)
+    # print('pk_new:', pk_new)
+    #
+    # sk_bytes = to_bytes(sk)
+    # print('sk_bytes:', sk_bytes)
+    #
+    # sk_new = to_big_num(sk_bytes)
+    # print('sk_new:', sk_new)
 
     # 示例数字
     # pk, sk = gen_key()
